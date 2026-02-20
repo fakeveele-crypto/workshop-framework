@@ -28,7 +28,7 @@
           <label class="form-label">Kategori</label>
           <select name="kategori_id" class="form-select" required>
             @foreach($kategoris as $k)
-              <option value="{{ $k->id }}" {{ $k->id == $buku->kategori_id ? 'selected' : '' }}>{{ $k->nama }}</option>
+              <option value="{{ $k->getKey() }}" {{ $k->getKey() == old('kategori_id', $buku->kategori_id) ? 'selected' : '' }}>{{ $k->nama }}</option>
             @endforeach
           </select>
         </div>

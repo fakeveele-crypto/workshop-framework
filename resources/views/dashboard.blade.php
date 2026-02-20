@@ -30,7 +30,11 @@
           <h4 class="font-weight-normal mb-3">Total Kategori <i class="mdi mdi-book-open-variant mdi-24px float-end"></i>
           </h4>
           <h2 class="mb-5">{{ $kategoriCount ?? 0 }}</h2>
-          <a href="{{ route('kategori.index') }}" class="text-white">Lihat semua kategori</a>
+          @auth
+            <a href="{{ route('kategori.index') }}" class="text-white">Lihat semua kategori</a>
+          @else
+            <a href="{{ route('login') }}" class="text-white">Login untuk melihat</a>
+          @endauth
         </div>
       </div>
     </div>
@@ -42,7 +46,11 @@
           <h4 class="font-weight-normal mb-3">Total Buku <i class="mdi mdi-book-multiple mdi-24px float-end"></i>
           </h4>
           <h2 class="mb-5">{{ $bukuCount ?? 0 }}</h2>
-          <a href="{{ route('buku.index') }}" class="text-white">Lihat semua buku</a>
+          @auth
+            <a href="{{ route('buku.index') }}" class="text-white">Lihat semua buku</a>
+          @else
+            <a href="{{ route('login') }}" class="text-white">Login untuk melihat</a>
+          @endauth
         </div>
       </div>
     </div>
@@ -78,7 +86,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse($recentKategoris as $i => $rk)
+                    @auth
+                      @forelse($recentKategoris as $i => $rk)
                       <tr>
                         <td>{{ $i+1 }}</td>
                         <td>{{ $rk->nama }}</td>
@@ -89,9 +98,12 @@
                           <a href="{{ route('kategori.edit',$rk) }}" class="btn btn-warning btn-sm">Edit</a>
                         </td>
                       </tr>
-                    @empty
-                      <tr><td colspan="4" class="text-center text-muted">Tidak ada kategori</td></tr>
-                    @endforelse
+                      @empty
+                        <tr><td colspan="4" class="text-center text-muted">Tidak ada kategori</td></tr>
+                      @endforelse
+                    @else
+                      <tr><td colspan="4" class="text-center">Silakan <a href="{{ route('login') }}">login</a> untuk melihat kategori.</td></tr>
+                    @endauth
                   </tbody>
                 </table>
               </div>
@@ -113,15 +125,19 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse($recentBukus as $rb)
+                    @auth
+                      @forelse($recentBukus as $rb)
                       <tr>
                         <td>{{ 'BK-'.str_pad($rb->id,2,'0',STR_PAD_LEFT) }}</td>
                         <td>{{ \Illuminate\Support\Str::limit($rb->judul,24) }}</td>
                         <td><label class="badge badge-gradient-success">{{ optional($rb->kategori)->nama }}</label></td>
                       </tr>
-                    @empty
-                      <tr><td colspan="3" class="text-center text-muted">Tidak ada buku</td></tr>
-                    @endforelse
+                      @empty
+                        <tr><td colspan="3" class="text-center text-muted">Tidak ada buku</td></tr>
+                      @endforelse
+                    @else
+                      <tr><td colspan="3" class="text-center">Silakan <a href="{{ route('login') }}">login</a> untuk melihat buku.</td></tr>
+                    @endauth
                   </tbody>
                 </table>
               </div>

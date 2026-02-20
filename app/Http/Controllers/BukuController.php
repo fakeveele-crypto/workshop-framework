@@ -35,7 +35,7 @@ class BukuController extends Controller
             'kode' => 'nullable|string|max:20',
             'judul' => 'required|string|max:500',
             'pengarang' => 'nullable|string|max:200',
-            'kategori_id' => 'nullable|integer'
+            'kategori_id' => 'required|integer'
         ]);
 
         Buku::create($data);
@@ -71,7 +71,7 @@ class BukuController extends Controller
             'kode' => 'nullable|string|max:20',
             'judul' => 'required|string|max:500',
             'pengarang' => 'nullable|string|max:200',
-            'kategori_id' => 'nullable|integer'
+            'kategori_id' => 'required|integer'
         ]);
 
         $buku->update($data);
