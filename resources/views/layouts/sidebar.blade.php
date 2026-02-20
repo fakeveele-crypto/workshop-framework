@@ -18,6 +18,12 @@
 				<i class="mdi mdi-format-list-bulleted menu-icon"></i>
 			</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="{{ route('pdf.index') }}">
+				<span class="menu-title">PDF</span>
+				<i class="mdi mdi-file-pdf menu-icon"></i>
+			</a>
+		</li>
 	</ul>
 </nav>
 
