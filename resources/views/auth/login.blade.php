@@ -23,8 +23,9 @@
           <input name="password" type="password" class="form-control" required>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-primary">Sign In</button>
-          <a href="{{ route('register') }}" class="btn btn-outline-secondary">Register</a>
+                    <button class="btn btn-primary">Sign In</button>
+                    <a href="{{ route('register') }}" class="btn btn-outline-secondary">Register</a>
+                    <a href="{{ url('auth/google') }}" class="btn btn-outline-danger">Login dengan Google</a>
         </div>
       </form>
     </div>
@@ -89,6 +90,8 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Login') }}
                                 </button>
+
+                                <a href="{{ url('auth/google') }}" class="btn btn-outline-danger mt-2">Login dengan Google</a>
 
                                 @if (Route::has('password.request'))
                                     <a class="btn btn-link" href="{{ route('password.request') }}">

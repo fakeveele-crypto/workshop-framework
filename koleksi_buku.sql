@@ -12,3 +12,20 @@ CREATE TABLE buku (
     CONSTRAINT FK_kategori FOREIGN KEY (idkategori) 
     REFERENCES kategori(idkategori) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+ALTER TABLE "public"."buku" 
+ADD CONSTRAINT fk_buku_kategori 
+FOREIGN KEY ("idkategori") 
+REFERENCES "public"."kategori" ("idkategori") 
+ON DELETE CASCADE 
+ON UPDATE CASCADE;
+
+ALTER TABLE "public"."buku" 
+ADD CONSTRAINT fk_buku_kategori 
+FOREIGN KEY ("idkategori") 
+REFERENCES "public"."kategori" ("idkategori") 
+ON DELETE CASCADE 
+ON UPDATE CASCADE;
+
+ALTER TABLE "public"."buku" 
+DROP CONSTRAINT fk_kategori;
