@@ -13,6 +13,12 @@
 			</a>
 		</li>
 		<li class="nav-item">
+			<a class="nav-link" href="{{ route('barang.index') }}">
+				<span class="menu-title">Barang</span>
+				<i class="mdi mdi-package-variant-closed menu-icon"></i>
+			</a>
+		</li>
+		<li class="nav-item">
 			<a class="nav-link" href="{{ route('kategori.index') }}">
 				<span class="menu-title">Kategori</span>
 				<i class="mdi mdi-format-list-bulleted menu-icon"></i>

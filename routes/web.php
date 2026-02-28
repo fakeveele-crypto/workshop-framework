@@ -17,6 +17,7 @@ Route::get('/home', function () { return redirect()->route('dashboard'); });
 Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function () {
     Route::resource('kategori', App\Http\Controllers\KategoriController::class);
     Route::resource('buku', App\Http\Controllers\BukuController::class);
+    Route::resource('barang', App\Http\Controllers\BarangController::class);
     Route::get('/cetak-sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('cetak.sertifikat');
     Route::get('/cetak-laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('cetak.laporan');
 });
