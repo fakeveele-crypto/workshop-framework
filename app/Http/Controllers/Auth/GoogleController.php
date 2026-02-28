@@ -13,20 +13,16 @@ use Illuminate\Support\Facades\Mail;
 
 class GoogleController extends Controller
 {
-    // Redirect the user to Google's OAuth page
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
-    // Handle callback from Google
     public function handleGoogleCallback()
     {
-    // 1. TAMBAHKAN stateless() agar tidak mental di localhost
     try {
         $googleUser = Socialite::driver('google')->stateless()->user();
     } catch (\Exception $e) {
-        // Jika masih error, kita ingin tahu errornya apa, jangan cuma ditebak
         return redirect()->route('login')->with('error', 'Gagal: ' . $e->getMessage());
     }
 

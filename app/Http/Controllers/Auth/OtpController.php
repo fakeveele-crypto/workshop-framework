@@ -13,17 +13,11 @@ use Illuminate\Support\Facades\Hash;
 
 class OtpController extends Controller
 {
-    /**
-     * Menampilkan form permintaan OTP (input email manual).
-     */
     public function showRequestForm()
     {
         return view('auth.otp_request');
     }
 
-    /**
-     * Mengirim OTP ke email (untuk jalur manual).
-     */
     public function send(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -31,7 +25,6 @@ class OtpController extends Controller
 
         $code = random_int(100000, 999999);
 
-        // Simpan data OTP di session berdasarkan email
         session([
             "otp_{$email}_code" => (string) $code,
             "otp_{$email}_expires_at" => now()->addMinutes(5),
@@ -43,15 +36,11 @@ class OtpController extends Controller
                 $m->to($email)->subject('Kode OTP Anda');
             });
         } catch (\Exception $e) {
-            // Error pengiriman email diabaikan untuk testing localhost
         }
 
         return redirect()->route('otp.verify.form')->with('info', 'Kode OTP telah dikirim ke email.');
     }
 
-    /**
-     * Menampilkan halaman input kode OTP.
-     */
     public function showVerifyForm(Request $request)
     {
         // 1. Cek Jalur Google (Berdasarkan otp_user_id di session)

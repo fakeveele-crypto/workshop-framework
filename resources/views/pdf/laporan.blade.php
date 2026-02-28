@@ -19,7 +19,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>PERPUSTAKAAN DIGITAL KOLEKSI BUKU</h2>
+        <h2>PERPUSTAKAAN DIGITAL KOLEKSI BUKU2</h2>
         <p>Fakultas Vokasi - Universitas Airlangga [cite: 41, 55]</p>
         <p>Kampus B Jl. Dharmawangsa Dalam Surabaya | Telp: (031) 5033869 [cite: 42]</p>
     </div>
