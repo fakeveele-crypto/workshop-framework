@@ -7,6 +7,12 @@
 			</a>
 		</li>
 		<li class="nav-item">
+			<a class="nav-link" href="{{ route('kategori.index') }}">
+				<span class="menu-title">Kategori</span>
+				<i class="mdi mdi-format-list-bulleted menu-icon"></i>
+			</a>
+		</li>
+		<li class="nav-item">
 			<a class="nav-link" href="{{ route('buku.index') }}">
 				<span class="menu-title">Buku</span>
 				<i class="mdi mdi-book-open-variant menu-icon"></i>
@@ -19,15 +25,9 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" href="{{ route('kategori.index') }}">
-				<span class="menu-title">Kategori</span>
-				<i class="mdi mdi-format-list-bulleted menu-icon"></i>
-			</a>
-		</li>
-		<li class="nav-item">
 			<a class="nav-link" href="{{ route('pdf.index') }}">
-				<span class="menu-title">PDF</span>
-				<i class="mdi mdi-file-pdf menu-icon"></i>
+				<span class="menu-title">Dokumen</span>
+				<i class="mdi mdi-file menu-icon"></i>
 			</a>
 		</li>
 	</ul>

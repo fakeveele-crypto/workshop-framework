@@ -25,13 +25,6 @@
           </div>
         @endif
 
-        @if(in_array('timestamp', $columns ?? [], true))
-          <div class="mb-3">
-            <label class="form-label">Timestamp</label>
-            <input type="datetime-local" name="timestamp" class="form-control" value="{{ old('timestamp') }}">
-          </div>
-        @endif
-
         <button class="btn btn-primary">Simpan</button>
         <a href="{{ route('barang.index') }}" class="btn btn-secondary">Batal</a>
       </form>
