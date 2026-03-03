@@ -114,15 +114,18 @@ class BarangController extends Controller
             return redirect()->route('barang.index')->with('error', 'Tabel barang belum tersedia di database.');
         }
 
+        $columnsCount = 5;
+        $rowsCount = 8;
+
         $validated = $request->validate([
             'selected_barang' => ['required', 'array', 'min:1'],
             'selected_barang.*' => ['required', 'integer'],
-            'x' => ['required', 'integer', 'between:1,5'],
-            'y' => ['required', 'integer', 'between:1,8'],
+            'x' => ['required', 'integer', 'between:1,' . $columnsCount],
+            'y' => ['required', 'integer', 'between:1,' . $rowsCount],
         ], [
             'selected_barang.required' => 'Pilih minimal 1 barang untuk dicetak.',
-            'x.between' => 'Nilai X harus antara 1 sampai 5.',
-            'y.between' => 'Nilai Y harus antara 1 sampai 8.',
+            'x.between' => 'Nilai X harus antara 1 sampai ' . $columnsCount . '.',
+            'y.between' => 'Nilai Y harus antara 1 sampai ' . $rowsCount . '.',
         ]);
 
         $ids = collect($validated['selected_barang'])
@@ -144,19 +147,20 @@ class BarangController extends Controller
 
         $x = (int) $validated['x'];
         $y = (int) $validated['y'];
-        $startIndex = (($y - 1) * 5) + ($x - 1);
+        $startIndex = (($y - 1) * $columnsCount) + ($x - 1);
 
-        $cells = array_fill(0, 40, null);
+        $totalCells = $columnsCount * $rowsCount;
+        $cells = array_fill(0, $totalCells, null);
         foreach ($barangs as $offset => $barang) {
             $cellIndex = $startIndex + $offset;
-            if ($cellIndex >= 40) {
+            if ($cellIndex >= $totalCells) {
                 break;
             }
             $cells[$cellIndex] = $barang;
         }
 
         $paperWidthMm = 210;
-        $paperHeightMm = 210;
+        $paperHeightMm = 165;
         $mmToPt = 72 / 25.4;
 
         $customPaper = [

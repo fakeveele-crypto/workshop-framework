@@ -5,7 +5,7 @@
     <title>Label Barang</title>
     <style>
         @page {
-            size: 210mm 210mm;
+            size: 210mm 165mm;
             margin: 0;
         }
 
@@ -17,7 +17,7 @@
         .sheet {
             position: relative;
             width: 210mm;
-            height: 210mm;
+            height: 165mm;
         }
 
         .label {
@@ -48,8 +48,8 @@
             @php
                 $row = intdiv($index, 5);
                 $col = $index % 5;
-                $left = 6.5 + ($col * 40);
-                $top = 7 + ($row * 25);
+                $left = 3 + ($col * 40);
+                $top = 0.5 + ($row * 20);
             @endphp
             <div class="label" style="left: {{ $left }}mm; top: {{ $top }}mm;">
                 @if($cell)
