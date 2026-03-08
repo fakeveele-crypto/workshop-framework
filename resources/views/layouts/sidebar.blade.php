@@ -30,6 +30,12 @@
 				<i class="mdi mdi-file menu-icon"></i>
 			</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="{{ route('inputbarang.html') }}">
+				<span class="menu-title">Input Barang</span>
+				<i class="mdi mdi-playlist-plus menu-icon"></i>
+			</a>
+		</li>
 	</ul>
 </nav>
 

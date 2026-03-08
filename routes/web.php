@@ -18,6 +18,9 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
     Route::resource('kategori', App\Http\Controllers\KategoriController::class);
     Route::resource('buku', App\Http\Controllers\BukuController::class);
     Route::resource('barang', App\Http\Controllers\BarangController::class);
+    Route::get('inputbarang/html', [App\Http\Controllers\InputBarangController::class, 'html'])->name('inputbarang.html');
+    Route::get('inputbarang/datatables', [App\Http\Controllers\InputBarangController::class, 'datatables'])->name('inputbarang.datatables');
+    Route::post('inputbarang', [App\Http\Controllers\InputBarangController::class, 'store'])->name('inputbarang.store');
     Route::post('barang/print-labels', [App\Http\Controllers\BarangController::class, 'printLabels'])->name('barang.print-labels');
     Route::get('/cetak-sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('cetak.sertifikat');
     Route::get('/cetak-laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('cetak.laporan');
