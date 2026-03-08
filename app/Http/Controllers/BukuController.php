@@ -32,10 +32,16 @@ class BukuController extends Controller
             return redirect()->route('buku.index')->with('error', 'Tabel buku belum tersedia.');
         }
         $data = $request->validate([
-            'kode' => 'nullable|string|max:20',
+            'kode' => 'required|string|max:20',
             'judul' => 'required|string|max:500',
-            'pengarang' => 'nullable|string|max:200',
-            'kategori_id' => 'required|integer'
+            'pengarang' => 'required|string|max:200',
+            'kategori_id' => 'required|integer|exists:kategori,idkategori'
+        ], [
+            'kode.required' => 'Kode wajib diisi.',
+            'judul.required' => 'Judul wajib diisi.',
+            'pengarang.required' => 'Pengarang wajib diisi.',
+            'kategori_id.required' => 'Kategori wajib dipilih.',
+            'kategori_id.exists' => 'Kategori yang dipilih tidak valid.'
         ]);
 
         Buku::create($data);
@@ -68,10 +74,16 @@ class BukuController extends Controller
             return redirect()->route('buku.index')->with('error', 'Buku tidak ditemukan.');
         }
         $data = $request->validate([
-            'kode' => 'nullable|string|max:20',
+            'kode' => 'required|string|max:20',
             'judul' => 'required|string|max:500',
-            'pengarang' => 'nullable|string|max:200',
-            'kategori_id' => 'required|integer'
+            'pengarang' => 'required|string|max:200',
+            'kategori_id' => 'required|integer|exists:kategori,idkategori'
+        ], [
+            'kode.required' => 'Kode wajib diisi.',
+            'judul.required' => 'Judul wajib diisi.',
+            'pengarang.required' => 'Pengarang wajib diisi.',
+            'kategori_id.required' => 'Kategori wajib dipilih.',
+            'kategori_id.exists' => 'Kategori yang dipilih tidak valid.'
         ]);
 
         $buku->update($data);

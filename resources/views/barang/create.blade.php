@@ -25,7 +25,7 @@
           </div>
         @endif
 
-        <button class="btn btn-primary">Simpan</button>
+        <button type="button" class="btn btn-primary btn-submit">Simpan</button>
         <a href="{{ route('barang.index') }}" class="btn btn-secondary">Batal</a>
       </form>
     </div>

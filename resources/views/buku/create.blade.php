@@ -13,7 +13,7 @@
         @csrf
         <div class="mb-3">
           <label class="form-label">Kode</label>
-          <input name="kode" class="form-control" value="{{ old('kode') }}">
+          <input name="kode" class="form-control" value="{{ old('kode') }}" required>
         </div>
         <div class="mb-3">
           <label class="form-label">Judul</label>
@@ -21,7 +21,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label">Pengarang</label>
-          <input name="pengarang" class="form-control" value="{{ old('pengarang') }}">
+          <input name="pengarang" class="form-control" value="{{ old('pengarang') }}" required>
         </div>
         <div class="mb-3">
           <label class="form-label">Kategori</label>
@@ -31,7 +31,7 @@
             @endforeach
           </select>
         </div>
-        <button class="btn btn-primary">Simpan</button>
+        <button type="button" class="btn btn-primary btn-submit">Simpan</button>
         <a href="{{ route('buku.index') }}" class="btn btn-secondary">Batal</a>
       </form>
     </div>

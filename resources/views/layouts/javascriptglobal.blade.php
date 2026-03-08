@@ -10,3 +10,40 @@
 <script src="{{ asset('assets/js/todolist.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.cookie.js') }}"></script>
 
+<script>
+	(function () {
+		document.addEventListener('click', function (event) {
+			const button = event.target.closest('.btn-submit');
+			if (!button || button.disabled) {
+				return;
+			}
+
+			const form = button.closest('form');
+			if (!form) {
+				return;
+			}
+
+			const confirmMessage = button.getAttribute('data-confirm');
+			if (confirmMessage && !window.confirm(confirmMessage)) {
+				return;
+			}
+
+			event.preventDefault();
+
+			if (!form.checkValidity()) {
+				form.reportValidity();
+				return;
+			}
+
+			if (!button.dataset.originalHtml) {
+				button.dataset.originalHtml = button.innerHTML;
+			}
+
+			button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Loading...';
+			button.disabled = true;
+
+			form.submit();
+		});
+	})();
+</script>
+

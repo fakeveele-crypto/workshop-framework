@@ -50,7 +50,7 @@
             <label for="y" class="form-label mb-1">Y (Baris 1-8)</label>
             <input type="number" min="1" max="8" name="y" id="y" class="form-control" value="{{ old('y', 1) }}" required style="width: 150px;">
           </div>
-          <button type="submit" class="btn btn-success">Print Label</button>
+          <button type="button" class="btn btn-success btn-submit">Print Label</button>
         </form>
       </div>
 
@@ -109,7 +109,7 @@
                   <form action="{{ route('barang.destroy', $barang->getKey()) }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus barang?')">Hapus</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-submit" data-confirm="Hapus barang?">Hapus</button>
                   </form>
                 </td>
               </tr>

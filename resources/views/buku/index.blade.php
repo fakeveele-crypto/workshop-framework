@@ -38,7 +38,7 @@
                   <form action="{{ route('buku.destroy',$b) }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus buku?')">Hapus</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-submit" data-confirm="Hapus buku?">Hapus</button>
                   </form>
                 </td>
               </tr>

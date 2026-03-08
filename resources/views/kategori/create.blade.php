@@ -15,7 +15,7 @@
           <label class="form-label">Nama Kategori</label>
           <input name="nama" class="form-control" required>
         </div>
-        <button class="btn btn-primary">Simpan</button>
+        <button type="button" class="btn btn-primary btn-submit">Simpan</button>
         <a href="{{ route('kategori.index') }}" class="btn btn-secondary">Batal</a>
       </form>
     </div>

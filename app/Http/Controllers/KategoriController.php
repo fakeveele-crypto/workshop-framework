@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kategori;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class KategoriController extends Controller
@@ -31,8 +33,18 @@ class KategoriController extends Controller
         }
 
         $data = $request->validate([ 'nama' => 'required|string|max:255' ]);
-        // Kategori model maps 'nama' to legacy 'nama_kategori'
-        Kategori::create($data);
+
+        try {
+            Kategori::create($data);
+        } catch (UniqueConstraintViolationException $exception) {
+            if (! $this->isKategoriPrimaryKeyConflict($exception)) {
+                throw $exception;
+            }
+
+            $this->syncKategoriPrimaryKeySequence();
+            Kategori::create($data);
+        }
+
         return redirect()->route('kategori.index')->with('success', 'Kategori ditambahkan.');
     }
 
@@ -79,5 +91,20 @@ class KategoriController extends Controller
 
         $kategori->delete();
         return redirect()->route('kategori.index')->with('success', 'Kategori dihapus.');
+    }
+
+    private function isKategoriPrimaryKeyConflict(UniqueConstraintViolationException $exception): bool
+    {
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return false;
+        }
+
+        $message = strtolower($exception->getMessage());
+        return str_contains($message, 'kategori_pkey') || str_contains($message, '(idkategori)');
+    }
+
+    private function syncKategoriPrimaryKeySequence(): void
+    {
+        DB::statement("SELECT setval(pg_get_serial_sequence('kategori', 'idkategori'), COALESCE((SELECT MAX(idkategori) FROM kategori), 0) + 1, false)");
     }
 }

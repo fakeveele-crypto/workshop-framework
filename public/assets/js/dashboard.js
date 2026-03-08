@@ -1,5 +1,6 @@
 (function ($) {
   'use strict';
+
   if ($("#visit-sale-chart").length) {
     const ctx = document.getElementById('visit-sale-chart');
 
