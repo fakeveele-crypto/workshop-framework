@@ -31,8 +31,8 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" href="{{ route('inputbarang.html') }}">
-				<span class="menu-title">Input Barang</span>
+			<a class="nav-link" href="{{ route('inputbarang.index') }}">
+				<span class="menu-title">Input</span>
 				<i class="mdi mdi-playlist-plus menu-icon"></i>
 			</a>
 		</li>

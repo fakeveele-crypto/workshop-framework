@@ -9,7 +9,10 @@
 @section('content')
   <div class="page-header d-flex justify-content-between align-items-center">
     <h3 class="page-title">Input Barang (Datatables)</h3>
-    <a href="{{ route('inputbarang.html') }}" class="btn btn-outline-primary">Buka Versi HTML Table</a>
+    <div class="d-flex gap-2">
+      <a href="{{ route('inputbarang.datatables.crud') }}" class="btn btn-outline-success">Buka Versi CRUD</a>
+      <a href="{{ route('inputbarang.html') }}" class="btn btn-outline-primary">Buka Versi HTML Table</a>
+    </div>
   </div>
 
   <div class="card mb-4">

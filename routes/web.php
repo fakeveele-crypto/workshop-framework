@@ -18,9 +18,15 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
     Route::resource('kategori', App\Http\Controllers\KategoriController::class);
     Route::resource('buku', App\Http\Controllers\BukuController::class);
     Route::resource('barang', App\Http\Controllers\BarangController::class);
+    Route::get('inputbarang', [App\Http\Controllers\InputBarangController::class, 'index'])->name('inputbarang.index');
+    Route::get('inputbarang/selectkota', [App\Http\Controllers\InputBarangController::class, 'selectKota'])->name('inputbarang.selectkota');
     Route::get('inputbarang/html', [App\Http\Controllers\InputBarangController::class, 'html'])->name('inputbarang.html');
     Route::get('inputbarang/datatables', [App\Http\Controllers\InputBarangController::class, 'datatables'])->name('inputbarang.datatables');
+    Route::get('inputbarang/html/crud', [App\Http\Controllers\InputBarangController::class, 'htmlCrud'])->name('inputbarang.html.crud');
+    Route::get('inputbarang/datatables/crud', [App\Http\Controllers\InputBarangController::class, 'datatablesCrud'])->name('inputbarang.datatables.crud');
     Route::post('inputbarang', [App\Http\Controllers\InputBarangController::class, 'store'])->name('inputbarang.store');
+    Route::put('inputbarang', [App\Http\Controllers\InputBarangController::class, 'update'])->name('inputbarang.update');
+    Route::delete('inputbarang', [App\Http\Controllers\InputBarangController::class, 'destroy'])->name('inputbarang.destroy');
     Route::post('barang/print-labels', [App\Http\Controllers\BarangController::class, 'printLabels'])->name('barang.print-labels');
     Route::get('/cetak-sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('cetak.sertifikat');
     Route::get('/cetak-laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('cetak.laporan');
