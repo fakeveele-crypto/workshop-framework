@@ -13,7 +13,7 @@
 
   <div class="card mb-4">
     <div class="card-body">
-      <form action="{{ route('inputbarang.store') }}" method="POST">
+      <form id="inputBarangForm" action="{{ route('inputbarang.store') }}" method="POST">
         @csrf
         <input type="hidden" name="redirect_to" value="html">
 
@@ -32,7 +32,7 @@
         </div>
 
         <div class="text-end">
-          <button type="button" class="btn btn-success btn-submit px-4">Submit</button>
+          <button type="button" id="submitInputBarang" class="btn btn-success btn-submit px-4">Submit</button>
         </div>
       </form>
     </div>
@@ -81,3 +81,35 @@
     </div>
   </div>
 @endsection
+
+@push('scripts')
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('inputBarangForm');
+      const namaInput = document.getElementById('nama');
+      const hargaInput = document.getElementById('harga');
+      const submitButton = document.getElementById('submitInputBarang');
+
+      if (namaInput) {
+        namaInput.focus();
+      }
+
+      if (form) {
+        form.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+            if (submitButton && !submitButton.disabled) {
+              event.preventDefault();
+              submitButton.click();
+            }
+          }
+        });
+      }
+
+      if (hargaInput) {
+        hargaInput.addEventListener('input', function () {
+          this.value = this.value.replace(/[^0-9.,]/g, '');
+        });
+      }
+    });
+  </script>
+@endpush
