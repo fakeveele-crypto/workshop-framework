@@ -5,10 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class BukuController extends Controller
 {
+    private function syncBukuSequenceIfNeeded(): void
+    {
+        if (DB::connection()->getDriverName() !== 'pgsql' || ! Schema::hasTable('buku')) {
+            return;
+        }
+
+        DB::statement("SELECT setval(pg_get_serial_sequence('buku', 'idbuku'), COALESCE((SELECT MAX(idbuku) FROM buku), 0) + 1, false)");
+    }
+
     public function index()
     {
         if (! Schema::hasTable('buku')) {
@@ -31,6 +41,9 @@ class BukuController extends Controller
         if (! Schema::hasTable('buku')) {
             return redirect()->route('buku.index')->with('error', 'Tabel buku belum tersedia.');
         }
+
+        $this->syncBukuSequenceIfNeeded();
+
         $data = $request->validate([
             'kode' => 'required|string|max:20',
             'judul' => 'required|string|max:500',
