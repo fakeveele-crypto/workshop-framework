@@ -27,6 +27,16 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
     Route::post('inputbarang', [App\Http\Controllers\InputBarangController::class, 'store'])->name('inputbarang.store');
     Route::put('inputbarang', [App\Http\Controllers\InputBarangController::class, 'update'])->name('inputbarang.update');
     Route::delete('inputbarang', [App\Http\Controllers\InputBarangController::class, 'destroy'])->name('inputbarang.destroy');
+    Route::prefix('modul5')->name('modul5.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Modul5Controller::class, 'index'])->name('index');
+        Route::get('pilihan-wilayah', [App\Http\Controllers\Modul5Controller::class, 'pilihanWilayah'])->name('pilihanwilayah');
+        Route::get('pilihan-wilayah/ajax', [App\Http\Controllers\Modul5Controller::class, 'pilihanWilayahAjax'])->name('pilihanwilayah.ajax');
+        Route::get('pilihan-wilayah/axios', [App\Http\Controllers\Modul5Controller::class, 'pilihanWilayahAxios'])->name('pilihanwilayah.axios');
+        Route::get('provinces', [App\Http\Controllers\Modul5Controller::class, 'provinces'])->name('provinces');
+        Route::get('regencies', [App\Http\Controllers\Modul5Controller::class, 'regencies'])->name('regencies');
+        Route::get('districts', [App\Http\Controllers\Modul5Controller::class, 'districts'])->name('districts');
+        Route::get('villages', [App\Http\Controllers\Modul5Controller::class, 'villages'])->name('villages');
+    });
     Route::post('barang/print-labels', [App\Http\Controllers\BarangController::class, 'printLabels'])->name('barang.print-labels');
     Route::get('/cetak-sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('cetak.sertifikat');
     Route::get('/cetak-laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('cetak.laporan');
