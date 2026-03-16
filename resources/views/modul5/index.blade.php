@@ -8,7 +8,10 @@
 			<h4 class="mb-0">Index Modul 5</h4>
 		</div>
 		<div class="card-body">
-			<a href="{{ route('modul5.pilihanwilayah.ajax') }}" class="btn btn-primary">Pilihan Wilayah</a>
+			<div class="d-flex flex-wrap gap-2">
+				<a href="{{ route('modul5.pilihanwilayah.ajax') }}" class="btn btn-primary">Pilihan Wilayah</a>
+				<a href="{{ route('modul5.pos') }}" class="btn btn-success">POS</a>
+			</div>
 		</div>
 	</div>
 @endsection

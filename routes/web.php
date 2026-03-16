@@ -32,6 +32,11 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
         Route::get('pilihan-wilayah', [App\Http\Controllers\Modul5Controller::class, 'pilihanWilayah'])->name('pilihanwilayah');
         Route::get('pilihan-wilayah/ajax', [App\Http\Controllers\Modul5Controller::class, 'pilihanWilayahAjax'])->name('pilihanwilayah.ajax');
         Route::get('pilihan-wilayah/axios', [App\Http\Controllers\Modul5Controller::class, 'pilihanWilayahAxios'])->name('pilihanwilayah.axios');
+        Route::get('pos', [App\Http\Controllers\Modul5Controller::class, 'pos'])->name('pos');
+        Route::get('pos/ajax', [App\Http\Controllers\Modul5Controller::class, 'posAjax'])->name('pos.ajax');
+        Route::get('pos/axios', [App\Http\Controllers\Modul5Controller::class, 'posAxios'])->name('pos.axios');
+        Route::get('pos/barang', [App\Http\Controllers\Modul5Controller::class, 'findBarangByKode'])->name('pos.barang');
+        Route::post('pos/checkout', [App\Http\Controllers\Modul5Controller::class, 'checkoutPos'])->name('pos.checkout');
         Route::get('provinces', [App\Http\Controllers\Modul5Controller::class, 'provinces'])->name('provinces');
         Route::get('regencies', [App\Http\Controllers\Modul5Controller::class, 'regencies'])->name('regencies');
         Route::get('districts', [App\Http\Controllers\Modul5Controller::class, 'districts'])->name('districts');
