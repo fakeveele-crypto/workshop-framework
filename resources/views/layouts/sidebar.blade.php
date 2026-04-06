@@ -42,6 +42,12 @@
 				<i class="mdi mdi-map-marker-radius menu-icon"></i>
 			</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="{{ auth()->check() ? route('vendor.index') : route('customer.index') }}">
+				<span class="menu-title">Kantin</span>
+				<i class="mdi mdi-store menu-icon"></i>
+			</a>
+		</li>
 	</ul>
 </nav>
 

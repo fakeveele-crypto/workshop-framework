@@ -50,6 +50,13 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
 Route::get('auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
 
+Route::prefix('kantin/customer')->name('customer.')->group(function () {
+    Route::get('/', [App\Http\Controllers\CustomerController::class, 'index'])->name('index');
+    Route::get('vendors/{idvendor}/menus', [App\Http\Controllers\CustomerController::class, 'menusByVendor'])->name('menus');
+    Route::post('checkout', [App\Http\Controllers\CustomerController::class, 'checkout'])->name('checkout');
+    Route::post('xendit/callback', [App\Http\Controllers\CustomerController::class, 'xenditCallback'])->name('xendit.callback');
+});
+
 // OTP request / send / verify
 Route::get('otp', [App\Http\Controllers\Auth\OtpController::class, 'showRequestForm'])->name('otp.request');
 Route::post('otp/send', [App\Http\Controllers\Auth\OtpController::class, 'send'])->name('otp.send');
@@ -61,4 +68,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pdf', function () { return view('pdf.index'); })->name('pdf.index');
     Route::get('pdf/sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('pdf.sertifikat');
     Route::get('pdf/laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('pdf.laporan');
+
+    Route::prefix('kantin/vendor')->name('vendor.')->group(function () {
+        Route::get('/', [App\Http\Controllers\VendorController::class, 'index'])->name('index');
+        Route::post('menu', [App\Http\Controllers\VendorController::class, 'store'])->name('store');
+        Route::get('menu/{idmenu}/edit', [App\Http\Controllers\VendorController::class, 'edit'])->name('edit');
+        Route::put('menu/{idmenu}', [App\Http\Controllers\VendorController::class, 'update'])->name('update');
+        Route::delete('menu/{idmenu}', [App\Http\Controllers\VendorController::class, 'destroy'])->name('destroy');
+        Route::get('orders', [App\Http\Controllers\VendorController::class, 'orders'])->name('orders');
+    });
 });
