@@ -48,6 +48,51 @@
 				<i class="mdi mdi-store menu-icon"></i>
 			</a>
 		</li>
+		@auth
+			<li class="nav-item">
+				<a
+					class="nav-link customer-toggle-link"
+					data-bs-toggle="collapse"
+					href="#customerMenu"
+					aria-expanded="{{ request()->routeIs('customer_data.*') ? 'true' : 'false' }}"
+					aria-controls="customerMenu"
+				>
+					<span class="menu-title">Customer</span>
+					<i class="mdi mdi-chevron-down customer-toggle-arrow"></i>
+					<i class="mdi mdi-account-multiple menu-icon"></i>
+				</a>
+				<div class="collapse {{ request()->routeIs('customer_data.*') ? 'show' : '' }}" id="customerMenu">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item">
+							<a class="nav-link {{ request()->routeIs('customer_data.index') ? 'active' : '' }}" href="{{ route('customer_data.index') }}">Data Customer</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link {{ request()->routeIs('customer_data.create_blob') ? 'active' : '' }}" href="{{ route('customer_data.create_blob') }}">Tambah Customer 1</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link {{ request()->routeIs('customer_data.create_path') ? 'active' : '' }}" href="{{ route('customer_data.create_path') }}">Tambah Customer 2</a>
+						</li>
+					</ul>
+				</div>
+			</li>
+		@endauth
 	</ul>
 </nav>
+
+<style>
+	.customer-toggle-link {
+		position: relative;
+	}
+
+	.customer-toggle-arrow {
+		font-size: 0.95rem;
+		margin-left: auto;
+		margin-right: 2rem;
+		transition: transform 0.2s ease;
+	}
+
+	.customer-toggle-link[aria-expanded="true"] .customer-toggle-arrow {
+		transform: rotate(180deg);
+	}
+</style>
 

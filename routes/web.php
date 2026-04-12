@@ -45,6 +45,14 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
     Route::post('barang/print-labels', [App\Http\Controllers\BarangController::class, 'printLabels'])->name('barang.print-labels');
     Route::get('/cetak-sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('cetak.sertifikat');
     Route::get('/cetak-laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('cetak.laporan');
+
+    Route::prefix('customer')->name('customer_data.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CustomerController::class, 'dataCustomer'])->name('index');
+        Route::get('tambah-1', [App\Http\Controllers\CustomerController::class, 'createCustomerBlob'])->name('create_blob');
+        Route::post('tambah-1', [App\Http\Controllers\CustomerController::class, 'storeCustomerBlob'])->name('store_blob');
+        Route::get('tambah-2', [App\Http\Controllers\CustomerController::class, 'createCustomerPath'])->name('create_path');
+        Route::post('tambah-2', [App\Http\Controllers\CustomerController::class, 'storeCustomerPath'])->name('store_path');
+    });
 });
 
 Route::get('auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle']);

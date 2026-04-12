@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Menu;
 use App\Models\Pesanan;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
@@ -267,6 +269,113 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function dataCustomer(): \Illuminate\Contracts\View\View
+    {
+        $this->ensureCustomerTable();
+
+        $customers = Customer::query()
+            ->orderByDesc('id')
+            ->get();
+
+        $customers->each(function (Customer $customer): void {
+            $customer->foto_blob_preview = $this->blobToDataUrl($customer->foto_blob);
+            $customer->foto_path_url = null;
+
+            if ($customer->foto_path && Storage::disk('public')->exists($customer->foto_path)) {
+                $customer->foto_path_url = Storage::url($customer->foto_path);
+            }
+        });
+
+        return view('customer.index', [
+            'customers' => $customers,
+        ]);
+    }
+
+    public function createCustomerBlob(): \Illuminate\Contracts\View\View
+    {
+        $this->ensureCustomerTable();
+
+        return view('customer.create_blob');
+    }
+
+    public function storeCustomerBlob(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $this->ensureCustomerTable();
+
+        $validated = $this->validateCustomerPayload($request);
+
+        try {
+            $snapshot = $this->decodeSnapshot((string) $validated['foto_snapshot']);
+
+            Customer::query()->create([
+                'nama' => $validated['nama'],
+                'alamat' => $validated['alamat'],
+                'provinsi' => $validated['provinsi'],
+                'kota' => $validated['kota'],
+                'kecamatan' => $validated['kecamatan'],
+                'kodepos_kelurahan' => $validated['kodepos_kelurahan'],
+                'foto_blob' => $this->normalizeBlobForDatabase($snapshot['binary']),
+                'foto_path' => null,
+            ]);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Gagal menyimpan data customer. Silakan coba ambil foto ulang.');
+        }
+
+        return redirect()
+            ->route('customer_data.index')
+            ->with('success', 'Data customer berhasil disimpan sebagai BYTEA.');
+    }
+
+    public function createCustomerPath(): \Illuminate\Contracts\View\View
+    {
+        $this->ensureCustomerTable();
+
+        return view('customer.create_path');
+    }
+
+    public function storeCustomerPath(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $this->ensureCustomerTable();
+
+        $validated = $this->validateCustomerPayload($request);
+
+        try {
+            $snapshot = $this->decodeSnapshot((string) $validated['foto_snapshot']);
+
+            $filename = 'customer_'.now()->format('YmdHis').'_'.Str::lower(Str::random(8)).'.'.$snapshot['extension'];
+            $storedPath = 'customer/'.$filename;
+
+            Storage::disk('public')->put($storedPath, $snapshot['binary']);
+
+            Customer::query()->create([
+                'nama' => $validated['nama'],
+                'alamat' => $validated['alamat'],
+                'provinsi' => $validated['provinsi'],
+                'kota' => $validated['kota'],
+                'kecamatan' => $validated['kecamatan'],
+                'kodepos_kelurahan' => $validated['kodepos_kelurahan'],
+                'foto_blob' => null,
+                'foto_path' => $storedPath,
+            ]);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Gagal menyimpan data customer. Silakan coba ambil foto ulang.');
+        }
+
+        return redirect()
+            ->route('customer_data.index')
+            ->with('success', 'Data customer berhasil disimpan sebagai file path.');
+    }
+
     private function createInvoiceUrl(Pesanan $order): string
     {
         $secretKey = (string) config('services.xendit.secret_key');
@@ -325,5 +434,84 @@ class CustomerController extends Controller
                 abort(500, "Tabel {$table} belum tersedia di database.");
             }
         }
+    }
+
+    private function ensureCustomerTable(): void
+    {
+        if (! Schema::hasTable('customer')) {
+            abort(500, 'Tabel customer belum tersedia di database.');
+        }
+    }
+
+    /**
+     * @return array{nama:string,alamat:string,provinsi:string,kota:string,kecamatan:string,kodepos_kelurahan:string,foto_snapshot:string}
+     */
+    private function validateCustomerPayload(Request $request): array
+    {
+        return $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'alamat' => ['required', 'string'],
+            'provinsi' => ['required', 'string', 'max:100'],
+            'kota' => ['required', 'string', 'max:100'],
+            'kecamatan' => ['required', 'string', 'max:100'],
+            'kodepos_kelurahan' => ['required', 'string', 'max:50'],
+            'foto_snapshot' => ['required', 'string'],
+        ]);
+    }
+
+    /**
+     * @return array{binary:string,extension:string}
+     */
+    private function decodeSnapshot(string $snapshotDataUrl): array
+    {
+        if (! preg_match('/^data:image\/(png|jpe?g|webp);base64,(.+)$/i', $snapshotDataUrl, $matches)) {
+            throw new RuntimeException('Format foto tidak valid. Ambil foto ulang dari kamera.');
+        }
+
+        $binary = base64_decode($matches[2], true);
+        if ($binary === false) {
+            throw new RuntimeException('Data foto tidak valid.');
+        }
+
+        $extension = strtolower($matches[1]) === 'jpeg' ? 'jpg' : strtolower($matches[1]);
+
+        return [
+            'binary' => $binary,
+            'extension' => $extension,
+        ];
+    }
+
+    private function blobToDataUrl(mixed $blob): ?string
+    {
+        if ($blob === null) {
+            return null;
+        }
+
+        $binary = null;
+
+        if (is_resource($blob)) {
+            $binary = stream_get_contents($blob) ?: null;
+        } elseif (is_string($blob)) {
+            if (str_starts_with($blob, '\\x')) {
+                $binary = hex2bin(substr($blob, 2)) ?: null;
+            } else {
+                $binary = $blob;
+            }
+        }
+
+        if (! is_string($binary) || $binary === '') {
+            return null;
+        }
+
+        return 'data:image/jpeg;base64,'.base64_encode($binary);
+    }
+
+    private function normalizeBlobForDatabase(string $binary): string
+    {
+        if (DB::getDriverName() === 'pgsql') {
+            return '\\x'.bin2hex($binary);
+        }
+
+        return $binary;
     }
 }

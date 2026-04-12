@@ -98,3 +98,17 @@ ALTER TABLE pesanan
 ADD COLUMN iduser INT,
 ADD COLUMN external_id VARCHAR(255),
 ADD COLUMN snap_token TEXT;
+
+CREATE TABLE customer (
+   id SERIAL PRIMARY KEY, 
+   nama VARCHAR(255),
+   alamat TEXT,
+   provinsi VARCHAR(100),
+   kota VARCHAR(100),
+   kecamatan VARCHAR(100),
+   kodepos_kelurahan VARCHAR(50),
+   foto_blob BYTEA, 
+   foto_path VARCHAR(255), 
+   created_at TIMESTAMP NULL,
+   updated_at TIMESTAMP NULL
+);
