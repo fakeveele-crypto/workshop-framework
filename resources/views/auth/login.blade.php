@@ -29,7 +29,6 @@
 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-gradient-primary btn-lg">Sign In</button>
-                    <a href="{{ route('otp.request') }}" class="btn btn-outline-info">Login dengan OTP</a>
                     <a href="{{ url('auth/google') }}" class="btn btn-outline-danger">Login dengan Google</a>
                     <a href="{{ route('register') }}" class="btn btn-outline-secondary">Belum punya akun? Register</a>
                 </div>

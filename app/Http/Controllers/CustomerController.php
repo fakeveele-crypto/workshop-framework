@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Xendit\Configuration;
 use Xendit\Invoice\InvoiceApi;
 
@@ -244,6 +245,28 @@ class CustomerController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function finish(Request $request, int $idpesanan): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+    {
+        $this->ensureKantinTables();
+
+        $order = Pesanan::query()->find($idpesanan);
+
+        if (! $order) {
+            return redirect()->route('customer.index')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        $qrcode = QrCode::format('svg')
+            ->size(260)
+            ->margin(1)
+            ->generate((string) $order->idpesanan);
+
+        return view('kantin.customer.pembayaran_selesai', [
+            'order' => $order,
+            'qrcode' => $qrcode,
+            'paymentConfirmed' => (int) $order->status_bayar === 1,
+        ]);
+    }
+
     private function createInvoiceUrl(Pesanan $order): string
     {
         $secretKey = (string) config('services.xendit.secret_key');
@@ -263,6 +286,7 @@ class CustomerController extends Controller
             'description' => 'Pembayaran pesanan #'.$order->idpesanan,
             'currency' => 'IDR',
             'invoice_duration' => 86400,
+            'success_redirect_url' => route('customer.pembayaran_selesai', ['idpesanan' => $order->idpesanan]),
         ]);
 
         $invoiceUrl = (string) $invoice->getInvoiceUrl();

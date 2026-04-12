@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Picqer\Barcode\BarcodeGeneratorSVG;
 
 class BarangController extends Controller
 {
@@ -143,6 +144,25 @@ class BarangController extends Controller
 
         if ($barangs->isEmpty()) {
             return redirect()->route('barang.index')->with('error', 'Data barang yang dipilih tidak ditemukan.');
+        }
+
+        // Generate barcode SVG untuk setiap barang dan attach langsung ke object
+        $generator = new BarcodeGeneratorSVG();
+
+        foreach ($barangs as $barang) {
+            // Ambil nilai id_barang dan convert ke string
+            $barcodeValue = (string) $barang->getKey();
+            
+            // Generate barcode SVG
+            $barcode_svg = $generator->getBarcode(
+                $barcodeValue,
+                BarcodeGeneratorSVG::TYPE_CODE_128,
+                2,
+                50
+            );
+            
+            // Convert ke base64 data URI dan attach ke object
+            $barang->barcode_data_uri = 'data:image/svg+xml;base64,' . base64_encode($barcode_svg);
         }
 
         $x = (int) $validated['x'];

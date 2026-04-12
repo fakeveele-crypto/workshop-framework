@@ -49,12 +49,14 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
 
 Route::get('auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
+Route::post('xendit/callback', [App\Http\Controllers\CustomerController::class, 'xenditCallback'])->name('xendit.callback.global');
 
 Route::prefix('kantin/customer')->name('customer.')->group(function () {
     Route::get('/', [App\Http\Controllers\CustomerController::class, 'index'])->name('index');
     Route::get('vendors/{idvendor}/menus', [App\Http\Controllers\CustomerController::class, 'menusByVendor'])->name('menus');
     Route::post('checkout', [App\Http\Controllers\CustomerController::class, 'checkout'])->name('checkout');
     Route::post('xendit/callback', [App\Http\Controllers\CustomerController::class, 'xenditCallback'])->name('xendit.callback');
+    Route::get('pembayaran-selesai/{idpesanan}', [App\Http\Controllers\CustomerController::class, 'finish'])->name('pembayaran_selesai');
 });
 
 // OTP request / send / verify

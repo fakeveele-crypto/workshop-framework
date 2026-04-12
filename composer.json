@@ -12,6 +12,8 @@
         "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
+        "picqer/php-barcode-generator": "^3.2",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "xendit/xendit-php": "^7.0"
     },
     "require-dev": {

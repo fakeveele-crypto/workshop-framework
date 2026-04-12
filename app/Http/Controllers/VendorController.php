@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
+use Xendit\Configuration;
+use Xendit\Invoice\InvoiceApi;
 
 class VendorController extends Controller
 {
@@ -139,6 +142,8 @@ class VendorController extends Controller
 
         $this->ensureKantinTables();
 
+        $this->syncPaidOrdersFromXendit();
+
         $orders = Pesanan::query()
             ->with('detail_pesanan.menu')
             ->where('status_bayar', 1)
@@ -165,6 +170,61 @@ class VendorController extends Controller
 
         if (! $user) {
             abort(403, 'Akses ditolak.');
+        }
+    }
+
+    private function syncPaidOrdersFromXendit(): void
+    {
+        if (! Schema::hasColumn('pesanan', 'external_id')) {
+            return;
+        }
+
+        $secretKey = (string) config('services.xendit.secret_key');
+        if ($secretKey === '') {
+            return;
+        }
+
+        $pendingOrders = Pesanan::query()
+            ->where('status_bayar', 0)
+            ->whereNotNull('external_id')
+            ->where('external_id', '!=', '')
+            ->orderByDesc('timestamp')
+            ->limit(50)
+            ->get();
+
+        if ($pendingOrders->isEmpty()) {
+            return;
+        }
+
+        Configuration::setXenditKey($secretKey);
+        $invoiceApi = new InvoiceApi();
+
+        foreach ($pendingOrders as $order) {
+            try {
+                $invoices = $invoiceApi->getInvoices(
+                    null,
+                    (string) $order->external_id,
+                    ['PAID', 'SETTLED'],
+                    1
+                );
+
+                $invoice = $invoices[0] ?? null;
+                if (! $invoice) {
+                    continue;
+                }
+
+                $invoiceStatus = strtoupper((string) $invoice->getStatus());
+                if (! in_array($invoiceStatus, ['PAID', 'SETTLED'], true)) {
+                    continue;
+                }
+
+                $order->update([
+                    'status_bayar' => 1,
+                    'metode_bayar' => 1,
+                ]);
+            } catch (Throwable $exception) {
+                continue;
+            }
         }
     }
 }
