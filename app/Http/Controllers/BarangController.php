@@ -94,6 +94,21 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('success', 'Data barang berhasil diperbarui.');
     }
 
+    public function show($id)
+    {
+        if (! Schema::hasTable('barang')) {
+            return redirect()->route('barang.index')->with('error', 'Tabel barang belum tersedia di database.');
+        }
+
+        $barang = Barang::find($id);
+        if (! $barang) {
+            return redirect()->route('barang.index')->with('error', 'Data barang tidak ditemukan.');
+        }
+
+        $columns = Schema::getColumnListing('barang');
+        return view('barang.show', compact('barang', 'columns'));
+    }
+
     public function destroy($id)
     {
         if (! Schema::hasTable('barang')) {
@@ -198,5 +213,18 @@ class BarangController extends Controller
         ])->setPaper($customPaper, 'portrait');
 
         return $pdf->stream('Label_Barang_' . now()->format('Ymd_His') . '.pdf');
+    }
+
+    public function cekData($id)
+    {
+        $barang = Barang::where('id_barang', $id)->first();
+        if (!$barang) {
+            return response()->json(['error' => 'Barang tidak ditemukan'], 404);
+        }
+        return response()->json([
+            'id_barang' => $barang->id_barang,
+            'nama' => $barang->nama,
+            'harga' => $barang->harga,
+        ]);
     }
 }

@@ -43,6 +43,7 @@ Route::middleware(['auth', \App\Http\Middleware\role::class])->group(function ()
         Route::get('villages', [App\Http\Controllers\Modul5Controller::class, 'villages'])->name('villages');
     });
     Route::post('barang/print-labels', [App\Http\Controllers\BarangController::class, 'printLabels'])->name('barang.print-labels');
+    Route::get('barang/cek-data/{id}', [App\Http\Controllers\BarangController::class, 'cekData'])->name('barang.cek-data');
     Route::get('/cetak-sertifikat', [App\Http\Controllers\PdfController::class, 'cetakSertifikat'])->name('cetak.sertifikat');
     Route::get('/cetak-laporan', [App\Http\Controllers\PdfController::class, 'cetakLaporan'])->name('cetak.laporan');
 

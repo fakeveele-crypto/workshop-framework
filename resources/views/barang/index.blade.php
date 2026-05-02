@@ -70,6 +70,8 @@
         </div>
       @endif
 
+      <div id="scanResult"></div>
+
       <div class="table-responsive">
         @php
           $displayColumns = collect($columns ?? [])->reject(function ($column) {
@@ -105,6 +107,7 @@
                   <td>{{ optional($barang->kategori)->nama }}</td>
                 @endif
                 <td>
+                  <a href="{{ route('barang.show', $barang->getKey()) }}" class="btn btn-sm btn-outline-info">Detail</a>
                   <a href="{{ route('barang.edit', $barang->getKey()) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                   <form action="{{ route('barang.destroy', $barang->getKey()) }}" method="POST" class="d-inline">
                     @csrf
@@ -116,6 +119,21 @@
             @endforeach
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scan Modal -->
+  <div class="modal fade" id="scanModal" tabindex="-1" aria-labelledby="scanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="scanModalLabel">Scan Barcode</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="reader" style="width: 100%; min-height: 420px; max-width: 640px; margin: 0 auto;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -145,6 +163,9 @@
             next: 'Berikutnya',
             previous: 'Sebelumnya'
           }
+        },
+        initComplete: function() {
+          $('#barangTable_filter label').append('<button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#scanModal" title="Scan Barcode"><i class="mdi mdi-barcode-scan"></i></button>');
         }
       });
 
@@ -164,6 +185,96 @@
         const checked = $('.row-checkbox:checked').length;
         $('#selectAllBarang').prop('checked', total > 0 && total === checked);
       });
+
+      let scanner;
+      let scanProcessed = false;
+
+      $('#scanModal').on('shown.bs.modal', function () {
+        if (scanner) {
+          return;
+        }
+
+        scanProcessed = false;
+        $('#reader').empty();
+
+        if (typeof Html5QrcodeScanner === 'undefined') {
+          console.error('Html5QrcodeScanner belum terdefinisi. Pastikan app.js dimuat.');
+          return;
+        }
+
+        scanner = new Html5QrcodeScanner(
+          "reader",
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            rememberLastUsedCamera: true,
+          },
+          /* verbose= */ false
+        );
+        scanner.render(onScanSuccess, onScanFailure);
+      });
+
+      $('#scanModal').on('hidden.bs.modal', function () {
+        if (scanner) {
+          scanner.clear().then(() => {
+            scanner = null;
+            $('#reader').empty();
+          }).catch(console.error);
+        } else {
+          $('#reader').empty();
+        }
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+      });
+
+      function onScanSuccess(decodedText, decodedResult) {
+        if (scanProcessed) {
+          return;
+        }
+        scanProcessed = true;
+
+        // Play beep
+        const audio = new Audio('/sounds/beep.mp3');
+        audio.play();
+
+        // Stop scanner
+        if (scanner) {
+          scanner.clear().catch(console.error);
+        }
+
+        // Close modal
+        $('#scanModal').modal('hide');
+
+        // Ensure the page returns cleanly to normal barang view
+        setTimeout(function () {
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+        }, 300);
+
+        // Fetch data
+        fetch(`/barang/cek-data/${decodedText}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              $('#scanResult').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Barang tidak ditemukan<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            } else {
+              $('#scanResult').html(`
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  <strong>Hasil Scan:</strong> ID: ${data.id_barang}, Nama: ${data.nama}, Harga: Rp ${data.harga.toLocaleString('id-ID')}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              `);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            $('#scanResult').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Terjadi kesalahan<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+          });
+      }
+
+      function onScanFailure(error) {
+        console.warn(`Code scan error = ${error}`);
+      }
     });
   </script>
 @endpush
