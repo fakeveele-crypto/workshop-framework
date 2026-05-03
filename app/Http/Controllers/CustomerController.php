@@ -149,6 +149,10 @@ class CustomerController extends Controller
                     $orderPayload['snap_token'] = null;
                 }
 
+                if (Schema::hasColumn('pesanan', 'guest_id')) {
+                    $orderPayload['guest_id'] = $validated['guest_id'];
+                }
+
                 $order = Pesanan::query()->create($orderPayload);
 
                 $externalId = (string) $order->idpesanan;
@@ -245,6 +249,66 @@ class CustomerController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function riwayat(Request $request): \Illuminate\Contracts\View\View
+    {
+        $this->ensureKantinTables();
+
+        $searchQuery = (string) $request->query('search', $request->query('guest_id', ''));
+        $orders = collect();
+
+        if ($searchQuery !== '') {
+            $query = Pesanan::query()->with('detail_pesanan.menu')->orderByDesc('timestamp');
+
+            if (preg_match('/^\d+$/', $searchQuery)) {
+                $query->where('idpesanan', (int) $searchQuery);
+            } else {
+                $query->where('guest_id', $searchQuery);
+            }
+
+            $orders = $query->get();
+        }
+
+        return view('kantin.customer.riwayat', [
+            'orders' => $orders,
+            'searchQuery' => $searchQuery,
+        ]);
+    }
+
+    public function detailPesanan(Request $request, int $idpesanan): JsonResponse
+    {
+        $this->ensureKantinTables();
+
+        $order = Pesanan::query()->with('detail_pesanan.menu')->find($idpesanan);
+
+        if (! $order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ], 404);
+        }
+
+        $menus = $order->detail_pesanan->map(function ($detail) {
+            return [
+                'nama_menu' => $detail->menu->nama_menu,
+                'harga' => (int) $detail->harga,
+                'jumlah' => (int) $detail->jumlah,
+                'subtotal' => (int) $detail->subtotal,
+            ];
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'order_id' => $order->idpesanan,
+                'guest_id' => $order->guest_id,
+                'timestamp' => $order->timestamp->format('d/m/Y H:i'),
+                'total' => (int) $order->total,
+                'status_bayar' => (int) $order->status_bayar,
+                'menus' => $menus,
+            ],
+        ]);
     }
 
     public function finish(Request $request, int $idpesanan): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse

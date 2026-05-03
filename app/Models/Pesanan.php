@@ -23,6 +23,7 @@ class Pesanan extends Model
         'status_bayar',
         'external_id',
         'snap_token',
+        'guest_id',
     ];
 
     protected $casts = [

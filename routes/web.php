@@ -66,6 +66,8 @@ Route::prefix('kantin/customer')->name('customer.')->group(function () {
     Route::post('checkout', [App\Http\Controllers\CustomerController::class, 'checkout'])->name('checkout');
     Route::post('xendit/callback', [App\Http\Controllers\CustomerController::class, 'xenditCallback'])->name('xendit.callback');
     Route::get('pembayaran-selesai/{idpesanan}', [App\Http\Controllers\CustomerController::class, 'finish'])->name('pembayaran_selesai');
+    Route::get('riwayat', [App\Http\Controllers\CustomerController::class, 'riwayat'])->name('riwayat');
+    Route::get('pesanan/{idpesanan}/detail', [App\Http\Controllers\CustomerController::class, 'detailPesanan'])->name('detail_pesanan');
 });
 
 // OTP request / send / verify
@@ -87,5 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('menu/{idmenu}', [App\Http\Controllers\VendorController::class, 'update'])->name('update');
         Route::delete('menu/{idmenu}', [App\Http\Controllers\VendorController::class, 'destroy'])->name('destroy');
         Route::get('orders', [App\Http\Controllers\VendorController::class, 'orders'])->name('orders');
+        Route::get('scan-barcode', [App\Http\Controllers\VendorController::class, 'scanBarcode'])->name('scan_barcode');
+        Route::post('scan-barcode', [App\Http\Controllers\VendorController::class, 'processScan'])->name('process_scan');
     });
 });

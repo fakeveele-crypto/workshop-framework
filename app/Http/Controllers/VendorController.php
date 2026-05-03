@@ -153,6 +153,80 @@ class VendorController extends Controller
         return view('kantin.vendor.orders', compact('orders'));
     }
 
+    public function scanBarcode()
+    {
+        $this->authorizeLoggedInUser();
+
+        $this->ensureKantinTables();
+
+        return view('kantin.vendor.scan_barcode');
+    }
+
+    public function processScan(Request $request)
+    {
+        $this->authorizeLoggedInUser();
+
+        $this->ensureKantinTables();
+
+        $validated = $request->validate([
+            'qr_code' => ['required', 'string'],
+        ]);
+
+        $barcodeValue = trim($validated['qr_code']);
+        $orderId = null;
+
+        if (ctype_digit($barcodeValue)) {
+            $orderId = (int) $barcodeValue;
+        } elseif (preg_match('/\d+/', $barcodeValue, $matches)) {
+            $orderId = (int) $matches[0];
+        }
+
+        $orderQuery = Pesanan::query()->with('detail_pesanan.menu.vendor');
+
+        $order = null;
+
+        if ($orderId !== null) {
+            $order = $orderQuery->find($orderId);
+        }
+
+        if (! $order && $barcodeValue !== '') {
+            $order = Pesanan::query()
+                ->with('detail_pesanan.menu.vendor')
+                ->where('external_id', $barcodeValue)
+                ->first();
+        }
+
+        if (! $order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ], 404);
+        }
+
+        // Check if the order belongs to this vendor (assuming vendor is logged in, but since no vendor association, maybe check menu vendor)
+        // For simplicity, assume all orders can be scanned, or add logic later
+
+        $menus = $order->detail_pesanan->map(function ($detail) {
+            return [
+                'nama_menu' => $detail->menu->nama_menu,
+                'jumlah' => $detail->jumlah,
+                'harga' => $detail->harga,
+                'subtotal' => $detail->subtotal,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'order_id' => $order->idpesanan,
+                'barcode_value' => $barcodeValue,
+                'status_bayar' => (int) $order->status_bayar,
+                'total' => $order->total,
+                'menus' => $menus,
+            ],
+        ]);
+    }
+
     private function ensureKantinTables(): void
     {
         $requiredTables = ['vendor', 'menu', 'pesanan', 'detail_pesanan'];

@@ -48,6 +48,31 @@
 				<i class="mdi mdi-store menu-icon"></i>
 			</a>
 		</li>
+		@guest
+			<li class="nav-item">
+				<a
+					class="nav-link customer-toggle-link"
+					data-bs-toggle="collapse"
+					href="#customerMenu"
+					aria-expanded="{{ request()->routeIs('customer.*') ? 'true' : 'false' }}"
+					aria-controls="customerMenu"
+				>
+					<span class="menu-title">Customer</span>
+					<i class="mdi mdi-chevron-down customer-toggle-arrow"></i>
+					<i class="mdi mdi-account-multiple menu-icon"></i>
+				</a>
+				<div class="collapse {{ request()->routeIs('customer.*') ? 'show' : '' }}" id="customerMenu">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item">
+							<a class="nav-link {{ request()->routeIs('customer.index') ? 'active' : '' }}" href="{{ route('customer.index') }}">Pemesanan</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link {{ request()->routeIs('customer.riwayat') ? 'active' : '' }}" href="{{ route('customer.riwayat') }}">Riwayat Pemesanan</a>
+						</li>
+					</ul>
+				</div>
+			</li>
+		@endguest
 		@auth
 			<li class="nav-item">
 				<a
@@ -74,6 +99,12 @@
 						</li>
 					</ul>
 				</div>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link {{ request()->routeIs('vendor.scan_barcode') ? 'active' : '' }}" href="{{ route('vendor.scan_barcode') }}">
+					<span class="menu-title">Scan Barcode</span>
+					<i class="mdi mdi-qrcode-scan menu-icon"></i>
+				</a>
 			</li>
 		@endauth
 	</ul>

@@ -186,45 +186,83 @@
         $('#selectAllBarang').prop('checked', total > 0 && total === checked);
       });
 
-      let scanner;
+      let scanner = null;
       let scanProcessed = false;
+      let scannerInitializing = false;
 
       $('#scanModal').on('shown.bs.modal', function () {
-        if (scanner) {
+        // Jika scanner sudah aktif, jangan inisialisasi lagi
+        if (scanner !== null) {
+          return;
+        }
+        
+        // Jika sedang proses inisialisasi, tunggu
+        if (scannerInitializing) {
           return;
         }
 
         scanProcessed = false;
-        $('#reader').empty();
+        scannerInitializing = true;
+        $('#reader').empty().html('<p class="text-info">Initializing camera...</p>');
 
-        if (typeof Html5QrcodeScanner === 'undefined') {
-          console.error('Html5QrcodeScanner belum terdefinisi. Pastikan app.js dimuat.');
-          return;
-        }
+        // Tunggu sedikit untuk memastikan library sudah siap
+        setTimeout(function() {
+          // Cek apakah library tersedia
+          if (typeof window.Html5QrcodeScanner === 'undefined') {
+            console.error('Html5QrcodeScanner tidak tersedia');
+            $('#reader').html('<p class="text-danger">Error: Barcode scanner library tidak tersedia. Silakan refresh halaman.</p>');
+            scannerInitializing = false;
+            return;
+          }
 
-        scanner = new Html5QrcodeScanner(
-          "reader",
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            rememberLastUsedCamera: true,
-          },
-          /* verbose= */ false
-        );
-        scanner.render(onScanSuccess, onScanFailure);
+          try {
+            scanner = new window.Html5QrcodeScanner(
+              "reader",
+              {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                rememberLastUsedCamera: true,
+                supportedScanTypes: [window.Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+              },
+              /* verbose= */ false
+            );
+            
+            scanner.render(onScanSuccess, onScanFailure);
+            scannerInitializing = false;
+          } catch (error) {
+            console.error('Error initializing scanner:', error);
+            $('#reader').html('<p class="text-danger">Error: ' + error.message + '. Silakan periksa izin kamera.</p>');
+            scanner = null;
+            scannerInitializing = false;
+          }
+        }, 300);
       });
 
       $('#scanModal').on('hidden.bs.modal', function () {
-        if (scanner) {
-          scanner.clear().then(() => {
+        if (scanner !== null) {
+          try {
+            scanner.clear().then(() => {
+              scanner = null;
+              $('#reader').empty();
+            }).catch(function(err) {
+              console.warn('Error clearing scanner:', err);
+              scanner = null;
+              $('#reader').empty();
+            });
+          } catch (error) {
+            console.error('Error stopping scanner:', error);
             scanner = null;
             $('#reader').empty();
-          }).catch(console.error);
+          }
         } else {
           $('#reader').empty();
         }
         $('body').removeClass('modal-open');
-        $('.modal-backdrop').remove();
+        
+        // Hapus semua modal backdrop yang tersisa
+        setTimeout(function() {
+          $('.modal-backdrop').remove();
+        }, 100);
       });
 
       function onScanSuccess(decodedText, decodedResult) {
@@ -233,43 +271,64 @@
         }
         scanProcessed = true;
 
+        console.log('Barcode detected:', decodedText);
+
         // Play beep
-        const audio = new Audio('/sounds/beep.mp3');
-        audio.play();
+        try {
+          const audio = new Audio('/sounds/beep.mp3');
+          audio.play().catch(function(err) {
+            console.warn('Audio play warning:', err);
+          });
+        } catch (error) {
+          console.warn('Could not play beep:', error);
+        }
 
         // Stop scanner
         if (scanner) {
-          scanner.clear().catch(console.error);
+          try {
+            scanner.clear().catch(function(err) {
+              console.warn('Error clearing scanner:', err);
+            });
+          } catch (error) {
+            console.error('Error stopping scanner:', error);
+          }
         }
 
         // Close modal
-        $('#scanModal').modal('hide');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('scanModal'));
+        if (modal) {
+          modal.hide();
+        } else {
+          $('#scanModal').modal('hide');
+        }
 
-        // Ensure the page returns cleanly to normal barang view
+        // Reset scanner untuk scan berikutnya
+        scanner = null;
+
+        // Fetch data dengan delay sedikit untuk memastikan modal tutup
         setTimeout(function () {
-          $('body').removeClass('modal-open');
-          $('.modal-backdrop').remove();
-        }, 300);
-
-        // Fetch data
-        fetch(`/barang/cek-data/${decodedText}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.error) {
-              $('#scanResult').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Barang tidak ditemukan<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
-            } else {
-              $('#scanResult').html(`
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  <strong>Hasil Scan:</strong> ID: ${data.id_barang}, Nama: ${data.nama}, Harga: Rp ${data.harga.toLocaleString('id-ID')}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-              `);
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            $('#scanResult').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Terjadi kesalahan<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
-          });
+          fetch(`/barang/cek-data/${decodedText}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.error) {
+                $('#scanResult').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Barang tidak ditemukan: ' + decodedText + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+              } else {
+                $('#scanResult').html(`
+                  <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Hasil Scan:</strong> ID: ${data.id_barang}, Nama: ${data.nama}, Harga: Rp ${data.harga.toLocaleString('id-ID')}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  </div>
+                `);
+              }
+              // Reset untuk scan berikutnya
+              scanProcessed = false;
+            })
+            .catch(error => {
+              console.error('Error fetching barang data:', error);
+              $('#scanResult').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Terjadi kesalahan: ' + error.message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+              scanProcessed = false;
+            });
+        }, 500);
       }
 
       function onScanFailure(error) {

@@ -9,6 +9,9 @@
 		@include('layouts.styleglobal')
 		{{-- Page styles --}}
 		@include('layouts.stylepage')
+
+		{{-- Vite --}}
+		@vite(['resources/css/app.css', 'resources/js/app.js'])
 	</head>
 	<body>
 		<div class="container-scroller">
