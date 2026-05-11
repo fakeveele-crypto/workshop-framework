@@ -106,6 +106,12 @@
 					<i class="mdi mdi-qrcode-scan menu-icon"></i>
 				</a>
 			</li>
+			<li class="nav-item">
+				<a class="nav-link {{ request()->routeIs('kunjungan_toko.*') ? 'active' : '' }}" href="{{ route('kunjungan_toko.index') }}">
+					<span class="menu-title">Kunjungan Toko</span>
+					<i class="mdi mdi-map-marker-check menu-icon"></i>
+				</a>
+			</li>
 		@endauth
 	</ul>
 </nav>

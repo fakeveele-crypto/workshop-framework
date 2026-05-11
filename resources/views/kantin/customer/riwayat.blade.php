@@ -85,7 +85,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="orderDetailContent">
-                    <!-- Content will be loaded here -->
                 </div>
             </div>
         </div>
@@ -159,7 +158,6 @@
 
                     document.getElementById('orderDetailContent').innerHTML = content;
 
-                    // Generate QR code
                     new QRCode(document.getElementById(`qrcode-${orderData.order_id}`), {
                         text: String(orderData.order_id),
                         width: 128,

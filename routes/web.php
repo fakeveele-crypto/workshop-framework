@@ -92,4 +92,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('scan-barcode', [App\Http\Controllers\VendorController::class, 'scanBarcode'])->name('scan_barcode');
         Route::post('scan-barcode', [App\Http\Controllers\VendorController::class, 'processScan'])->name('process_scan');
     });
+
+    Route::prefix('kunjungan-toko')->name('kunjungan_toko.')->group(function () {
+        Route::get('/', [App\Http\Controllers\KunjunganTokoController::class, 'index'])->name('index');
+        Route::get('tambah', [App\Http\Controllers\KunjunganTokoController::class, 'create'])->name('create');
+        Route::post('tambah', [App\Http\Controllers\KunjunganTokoController::class, 'store'])->name('store');
+        Route::get('scan', [App\Http\Controllers\KunjunganTokoController::class, 'scan'])->name('scan');
+        Route::post('scan', [App\Http\Controllers\KunjunganTokoController::class, 'processScan'])->name('process_scan');
+        Route::get('history', [App\Http\Controllers\KunjunganTokoController::class, 'history'])->name('history');
+    });
 });

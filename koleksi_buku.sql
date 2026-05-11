@@ -112,3 +112,23 @@ CREATE TABLE customer (
    created_at TIMESTAMP NULL,
    updated_at TIMESTAMP NULL
 );
+
+CREATE TABLE lokasi_toko (
+	barcode VARCHAR(8) PRIMARY KEY,
+	nama_toko VARCHAR(50) NOT NULL, 
+	latitude DOUBLE PRECISION NOT NULL, 
+	longitude DOUBLE PRECISION NOT NULL, 
+	accuracy DOUBLE PRECISION NOT NULL 
+);
+
+CREATE TABLE kunjungan_toko (
+   id SERIAL PRIMARY KEY,
+   barcode_toko VARCHAR(8) NOT NULL,
+   lat_sales DOUBLE PRECISION NOT NULL,
+   lng_sales DOUBLE PRECISION NOT NULL,
+   acc_sales DOUBLE PRECISION NOT NULL,
+   jarak_aktual DOUBLE PRECISION,
+   status CHAR(1), 
+   waktu_kunjungan TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   CONSTRAINT fk_toko FOREIGN KEY (barcode_toko) REFERENCES lokasi_toko(barcode)
+);
