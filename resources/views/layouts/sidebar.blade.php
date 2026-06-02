@@ -48,6 +48,12 @@
 				<i class="mdi mdi-store menu-icon"></i>
 			</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link {{ request()->routeIs('antrian.*') ? 'active' : '' }}" href="{{ auth()->check() ? route('antrian.admin') : route('antrian.guest') }}">
+				<span class="menu-title">Antrian</span>
+				<i class="mdi mdi-account-clock menu-icon"></i>
+			</a>
+		</li>
 		@guest
 			<li class="nav-item">
 				<a
@@ -100,19 +106,25 @@
 					</ul>
 				</div>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link {{ request()->routeIs('vendor.scan_barcode') ? 'active' : '' }}" href="{{ route('vendor.scan_barcode') }}">
-					<span class="menu-title">Scan Barcode</span>
-					<i class="mdi mdi-qrcode-scan menu-icon"></i>
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link {{ request()->routeIs('kunjungan_toko.*') ? 'active' : '' }}" href="{{ route('kunjungan_toko.index') }}">
-					<span class="menu-title">Kunjungan Toko</span>
-					<i class="mdi mdi-map-marker-check menu-icon"></i>
-				</a>
-			</li>
 		@endauth
+		<li class="nav-item">
+			<a class="nav-link {{ request()->routeIs('vendor.scan_barcode') ? 'active' : '' }}" href="{{ route('vendor.scan_barcode') }}">
+				<span class="menu-title">Scan Barcode</span>
+				<i class="mdi mdi-qrcode-scan menu-icon"></i>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link {{ request()->routeIs('kunjungan_toko.*') ? 'active' : '' }}" href="{{ route('kunjungan_toko.index') }}">
+				<span class="menu-title">Kunjungan Toko</span>
+				<i class="mdi mdi-map-marker-check menu-icon"></i>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link {{ request()->routeIs('nfc.index') ? 'active' : '' }}" href="{{ route('nfc.index') }}">
+				<span class="menu-title">Absensi NFC</span>
+				<i class="mdi mdi-nfc menu-icon"></i>
+			</a>
+		</li>
 	</ul>
 </nav>
 

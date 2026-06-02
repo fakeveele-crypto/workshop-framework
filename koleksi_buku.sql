@@ -132,3 +132,10 @@ CREATE TABLE kunjungan_toko (
    waktu_kunjungan TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    CONSTRAINT fk_toko FOREIGN KEY (barcode_toko) REFERENCES lokasi_toko(barcode)
 );
+
+lokasi_tokoINSERT INTO lokasi_toko (barcode, nama_toko, latitude, longitude, accuracy) VALUES 
+	('TKO-002', 'Warung Sembako Mak Yah', -7.272100, 112.757900, 25.0),
+	('TKO-003', 'Warkop Srikana Jaya', -7.270900, 112.758100, 15.0),
+	('TKO-004', 'Toko Kelontong Bu Siti KarMen', -7.269500, 112.759200, 22.0),
+	('TKO-005', 'Warung Pojok Dharmawangsa', -7.274500, 112.758500, 18.0)
+;

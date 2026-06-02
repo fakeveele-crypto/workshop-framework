@@ -2,6 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('/antrian', [App\Http\Controllers\AntrianController::class, 'index'])->name('antrian.index');
+Route::get('/guest', [App\Http\Controllers\AntrianController::class, 'guest'])->name('antrian.guest');
+Route::post('/guest', [App\Http\Controllers\AntrianController::class, 'storeGuest'])->name('antrian.guest.store');
+Route::get('/guest/{token}', [App\Http\Controllers\AntrianController::class, 'showGuestTicket'])->name('antrian.guest.ticket');
+Route::get('/papanantrian', [App\Http\Controllers\AntrianController::class, 'board'])->name('antrian.board');
+Route::get('/sse/antrian', [App\Http\Controllers\AntrianController::class, 'stream'])->name('antrian.sse');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/admin', [App\Http\Controllers\AntrianController::class, 'admin'])->name('antrian.admin');
+    Route::post('/admin/antrian/panggil', [App\Http\Controllers\AntrianController::class, 'callNext'])->name('antrian.call');
+    Route::post('/admin/antrian/terlambat/{token}', [App\Http\Controllers\AntrianController::class, 'markLate'])->name('antrian.late');
+    Route::post('/admin/antrian/terlambat/{token}/panggil', [App\Http\Controllers\AntrianController::class, 'recallLate'])->name('antrian.recall');
+    Route::post('/admin/antrian/reset', [App\Http\Controllers\AntrianController::class, 'resetAntrian'])->name('antrian.reset');
+    Route::post('/admin/antrian/selesai/{token}', [App\Http\Controllers\AntrianController::class, 'complete'])->name('antrian.complete');
+});
+
 Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.post');
 Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
@@ -11,6 +27,8 @@ Route::post('register', [App\Http\Controllers\Auth\RegisterController::class, 'r
 
 // Dashboard is public (guests can view the page)
 Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+// NFC reader (public, no auth)
+Route::get('/nfc-reader', [App\Http\Controllers\NfcController::class, 'index'])->name('nfc.index');
 Route::get('/home', function () { return redirect()->route('dashboard'); });
 
 // Protected routes: authenticated users with role 'user'
